@@ -1,12 +1,24 @@
 package com.tahometer.volodymyrpoli.todolistapp.controller;
 
+import com.tahometer.volodymyrpoli.todolistapp.entity.Project;
+import com.tahometer.volodymyrpoli.todolistapp.entity.Task;
+import com.tahometer.volodymyrpoli.todolistapp.entity.dto.TaskDTO;
 import com.tahometer.volodymyrpoli.todolistapp.exception.NotFoundException;
+import com.tahometer.volodymyrpoli.todolistapp.repository.ProjectRepository;
 import com.tahometer.volodymyrpoli.todolistapp.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -15,39 +27,63 @@ import java.util.Objects;
 public class TaskController {
 
     private final TaskRepository taskRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public TaskController(TaskRepository taskRepository) {
+    public TaskController(TaskRepository taskRepository, ProjectRepository projectRepository) {
         this.taskRepository = taskRepository;
+        this.projectRepository = projectRepository;
     }
 
     @GetMapping("{id}")
-    public Map<String, Object> getTask(@PathVariable("id") Integer id) throws NotFoundException {
-        return taskRepository.getTask(id);
+    public Task getTask(@PathVariable("id") Integer id) {
+        return taskRepository.getOne(id);
     }
 
     @GetMapping
-    public List<Map<String, Object>> getTasksForProject(@RequestParam("projectId") Integer projectId) {
+    public List<Task> getTasksForProject(@RequestParam("projectId") Integer projectId) {
         if (Objects.isNull(projectId)) {
-            return taskRepository.getTasks();
+            return taskRepository.findAll();
         }
-        return taskRepository.getTasksByProjectId(projectId);
+        return taskRepository.findAllByProjectId(projectId);
     }
 
     @PostMapping
-    public Map<String, Object> createTask(@RequestBody Map<String, Object> task) {
+    public Task createTask(@RequestBody TaskDTO taskDTO) throws NotFoundException {
+        Task task = new Task();
+
+        map(taskDTO, task);
+
+        if (Objects.nonNull(taskDTO.getProjectId())) {
+            Project project = projectRepository
+                    .findById(taskDTO.getProjectId())
+                    .orElseThrow(NotFoundException::new);
+            task.setProject(project);
+        }
+
         return taskRepository.save(task);
     }
 
     @DeleteMapping("{id}")
-    public void deleteTask(@PathVariable("id") Integer id) throws NotFoundException {
-        taskRepository.delete(id);
+    public void deleteTask(@PathVariable("id") Integer id) {
+        taskRepository.deleteById(id);
     }
 
     @PatchMapping("{id}")
-    public Map<String, Object> patchTask(@PathVariable("id") Integer id, @RequestBody Map<String, Object> task) throws NotFoundException {
-        return taskRepository.patch(id, task);
+    public Task patchTask(@PathVariable("id") Integer id, @RequestBody TaskDTO taskDTO) throws NotFoundException {
+        Task task = taskRepository.findById(id).orElseThrow(NotFoundException::new);
+        map(taskDTO, task);
+        return taskRepository.save(task);
     }
 
+    private void map(TaskDTO taskDTO, Task task) {
+        if (Objects.nonNull(taskDTO.getTitle())) {
+            task.setTitle(taskDTO.getTitle());
+        }
+
+        if (Objects.nonNull(taskDTO.getMark())) {
+            task.setMark(taskDTO.getMark());
+        }
+    }
 
 }

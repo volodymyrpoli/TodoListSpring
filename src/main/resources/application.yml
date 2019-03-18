@@ -4,3 +4,5 @@ spring:
         url: jdbc:postgresql://localhost:5432/todolist
         username: postgres
         password: admin
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQL9Dialect
