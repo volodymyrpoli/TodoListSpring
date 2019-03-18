@@ -49,7 +49,7 @@ public class ProjectRepository {
     }
 
     public Map<String, Object> save(Map<String, Object> project) {
-        project.put("id", String.valueOf(generateId()));
+        project.put("id", generateId());
         data.add(project);
         return project;
     }
