@@ -3,6 +3,7 @@ package com.tahometer.volodymyrpoli.todolistapp.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +20,7 @@ public class Task {
     private Integer id;
     private String title;
     private Boolean mark;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Project project;
 
 }

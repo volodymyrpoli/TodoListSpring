@@ -7,6 +7,7 @@ import com.tahometer.volodymyrpoli.todolistapp.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,9 @@ public class ProjectController {
 
     @GetMapping
     public List<Project> getProjects() {
-        return projectRepository.findAll();
+        List<Project> projects = projectRepository.findAll();
+        projects.sort(Comparator.comparing(Project::getName));
+        return projects;
     }
 
     @GetMapping("{id}")
