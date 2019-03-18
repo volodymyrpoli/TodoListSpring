@@ -7,16 +7,7 @@ import com.tahometer.volodymyrpoli.todolistapp.exception.NotFoundException;
 import com.tahometer.volodymyrpoli.todolistapp.repository.ProjectRepository;
 import com.tahometer.volodymyrpoli.todolistapp.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +48,7 @@ public class TaskController {
         if (Objects.nonNull(taskDTO.getProjectId())) {
             Project project = projectRepository
                     .findById(taskDTO.getProjectId())
-                    .orElseThrow(NotFoundException::new);
+                    .orElseThrow(() -> new NotFoundException("Can't find project with id=" + taskDTO.getProjectId()));
             task.setProject(project);
         }
 
@@ -71,7 +62,9 @@ public class TaskController {
 
     @PatchMapping("{id}")
     public Task patchTask(@PathVariable("id") Integer id, @RequestBody TaskDTO taskDTO) throws NotFoundException {
-        Task task = taskRepository.findById(id).orElseThrow(NotFoundException::new);
+        Task task = taskRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Can't find task with id=" + id.toString()));
         map(taskDTO, task);
         return taskRepository.save(task);
     }
