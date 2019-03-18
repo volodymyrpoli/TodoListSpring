@@ -57,14 +57,18 @@ public class ProjectController {
         Project foundProject = projectRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Can't find project with id=" + id.toString()));
-        if (Objects.nonNull(projectDTO.getName())){
-            foundProject.setName(projectDTO.getName());
-        }
-        if (Objects.nonNull(projectDTO.getPinned())) {
-            foundProject.setPinned(projectDTO.getPinned());
-        }
+        map(projectDTO, foundProject);
 
         return projectRepository.save(foundProject);
+    }
+
+    private void map(ProjectDTO projectDTO, Project project) {
+        if (Objects.nonNull(projectDTO.getName())){
+            project.setName(projectDTO.getName());
+        }
+        if (Objects.nonNull(projectDTO.getPinned())) {
+            project.setPinned(projectDTO.getPinned());
+        }
     }
 
 }
