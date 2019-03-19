@@ -30,7 +30,9 @@ public class AuthenticationRestController {
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public AuthenticationRestController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Qualifier("jwtUserDetailsService") UserDetailsService userDetailsService) {
+    public AuthenticationRestController(AuthenticationManager authenticationManager,
+                                        JwtTokenUtil jwtTokenUtil,
+                                        @Qualifier("jwtUserDetailsService") UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
